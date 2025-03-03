@@ -49,7 +49,7 @@ const gameConstants = {
   diameterFlight: 100, // can be adjusted
   diameterBullet: 15,
   minimapMarkerDiamter: 10,
-  warpCooldownTime: 10000, // 10 seconds cooldown for warping
+  warpCooldownTime: 30000, // 10 seconds cooldown for warping
   shootingIntervals: {
     'Extreem (0.1s)': 100,
     'Very fast (0.3s)': 300,
@@ -749,12 +749,14 @@ function drawWarpGateCountDownOnGameArea() {
       // Draw cooldown progress arc
       noFill();
       stroke('cyan');
-      strokeWeight(4);
+      strokeWeight(10);
+
+      let diameterCountdown = 30
       arc(
         screenLayout.xGameArea + xLocalUp,
         screenLayout.yGameArea + yLocalUp,
-        selectedPlanet.diameterWarpGate * 0.8,
-        selectedPlanet.diameterWarpGate * 0.8,
+        diameterCountdown * 0.8,
+        diameterCountdown * 0.8,
         0,
         cooldownRatio * TWO_PI
       );
@@ -768,7 +770,7 @@ function drawWarpGateCountDownOnGameArea() {
         // Draw cooldown progress arc
         noFill();
         stroke('magenta');
-        strokeWeight(17);
+        strokeWeight(10);
 
         let diameterCountdown = 30
         arc(
@@ -790,14 +792,14 @@ function moveMe() {
   // Local movement (game area)
   let localOffX = 0;
   let localOffY = 0;
-  const localSpeed = 3;
+  const localSpeed = 9; // 3
   if (keyIsDown(70)) { localOffX = -localSpeed } // F
   if (keyIsDown(72)) { localOffX = localSpeed }  // H
   if (keyIsDown(84)) { localOffY = -localSpeed } // T
   if (keyIsDown(71)) { localOffY = localSpeed }  // G
 
   // Global movement (planet)
-  const globalSpeed = 6;
+  const globalSpeed = 12; // 6
   let gOffX = 0, gOffY = 0;
   if (keyIsDown(65)) { gOffX = -globalSpeed } // A
   if (keyIsDown(68)) { gOffX = globalSpeed }  // D
