@@ -322,40 +322,22 @@ class BasicMinimap {
       fill('black');
       rect(0, 0, screenLayout.xGameArea, screenLayout.screenHeight);
       
-      // Draw minimap with gradient based on planet index
-      let colorCenter, colorEdge;
+      // Get colors consistent with the selected planet
+      const colorScheme = getPlanetColorScheme(me.planetIndex);
       
-      switch(me.planetIndex) {
-        case 0: // Blue planet
-          colorCenter = [20, 50, 160];
-          colorEdge = [80, 120, 200];
-          break;
-        case 1: // Green planet
-          colorCenter = [20, 120, 40];
-          colorEdge = [100, 180, 100];
-          break;
-        case 2: // Red planet
-          colorCenter = [120, 20, 20];
-          colorEdge = [200, 100, 100];
-          break;
-        case 3: // Yellow planet
-          colorCenter = [120, 120, 20];
-          colorEdge = [200, 200, 100];
-          break;
-        case 4: // Purple planet
-          colorCenter = [80, 20, 120];
-          colorEdge = [150, 80, 200];
-          break;
-        default:
-          colorCenter = [50, 50, 50];
-          colorEdge = [120, 120, 120];
-      }
-      
-      // Draw the gradient
-      this.drawMinimapGradient(colorCenter, colorEdge);
+      // Draw the gradient using the planetColors scheme
+      this.drawMinimapGradient(colorScheme.center, colorScheme.edge);
       
       // Draw warp gate indicators on the minimap
       this.drawWarpGateIndicators();
+      
+      // Draw planet name
+      push();
+      fill('white');
+      textAlign(CENTER, BOTTOM);
+      textSize(14);
+      text(colorScheme.name, this.xMinimap, this.yMinimap + this.diameterMinimap/2 + 20);
+      pop();
     }
   }
   
@@ -539,11 +521,45 @@ class Planet extends CelestialObject {
       }
 
     } else {
-      fill(this.color[0], this.color[1], this.color[2]);
+      // Use the shared color palette for consistency
+      const colorScheme = getPlanetColorScheme(this.planetIndex);
+    
+      this.drawGradient(colorScheme.center, colorScheme.edge);
+      // Apply the base color from the scheme's center color
+//      fill(colorScheme.center[0], colorScheme.center[1], colorScheme.center[2]);
+//      noStroke();
+//      circle(this.x + this.size / 2, this.y + this.size / 2, this.size);
+      
+      // Optionally add a highlight for depth
+/*      push();
       noStroke();
-      circle(this.x, this.y, this.size);
+      fill(colorScheme.edge[0], colorScheme.edge[1], colorScheme.edge[2], 120);
+      circle(this.x - this.size/5, this.y - this.size/5, this.size/2);
+      pop();
+      */
     }
   }
+  drawGradient(colorCenter, colorEdge) {
+    push();
+    noStroke();
+    const radius = this.size / 2;
+    const numSteps = 30; // More steps = smoother gradient
+    
+    for (let i = numSteps; i > 0; i--) {
+      const step = i / numSteps;
+      const currentRadius = radius * step;
+      
+      // Interpolate between the two colors using arrays instead of color objects
+      const r = lerp(colorCenter[0], colorEdge[0], 1 - step);
+      const g = lerp(colorCenter[1], colorEdge[1], 1 - step);
+      const b = lerp(colorCenter[2], colorEdge[2], 1 - step);
+      
+      fill(r, g, b);
+      circle(this.x + this.size / 2, this.y + this.size / 2, currentRadius * 2);
+    }
+    pop();
+  }
+
   onPlanet(xF, yF) {
     let posX = map(this.size / 2, 0, this.size, 0, this.diameterPlanet);
     let posY = map(this.size / 2, 0, this.size, 0, this.diameterPlanet);

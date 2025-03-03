@@ -241,6 +241,47 @@ function preload() {
   planetBackgroundImages[4] = loadImage("images/planet4/planet4withWarpGate.png");
 }
 
+// Add a centralized planet color palette after the existing constants
+const planetColors = {
+  0: { // Blue planet
+    center: [20, 50, 160],
+    edge: [80, 120, 200],
+    name: "Azure"
+  },
+  1: { // Green planet
+    center: [20, 120, 40],
+    edge: [100, 180, 100],
+    name: "Verdant"
+  },
+  2: { // Red planet
+    center: [120, 20, 20],
+    edge: [200, 100, 100],
+    name: "Crimson"
+  },
+  3: { // Yellow planet
+    center: [120, 120, 20],
+    edge: [200, 200, 100],
+    name: "Amber"
+  },
+  4: { // Purple planet
+    center: [80, 20, 120],
+    edge: [150, 80, 200],
+    name: "Violet"
+  }
+};
+
+// Helper function to get planet color scheme
+function getPlanetColorScheme(planetIndex) {
+  if (planetColors.hasOwnProperty(planetIndex)) {
+    return planetColors[planetIndex];
+  }
+  return {
+    center: [50, 50, 50],
+    edge: [120, 120, 120],
+    name: "Unknown"
+  };
+}
+
 function draw() {
 
   // Debug loading status every 60 frames
@@ -571,13 +612,16 @@ function drawGameArea() {
     // Draw the warp gates on top of the background
     drawWarpGateCountDownOnGameArea();
   } else {
+    // Get colors consistent with the planet type
+    const colorScheme = getPlanetColorScheme(me.planetIndex);
+    
     // Draw the planet with a radial gradient
     drawRadialGradient(
       screenLayout.xGameArea - me.xGlobal + selectedPlanet.diameterPlanet / 2, 
       screenLayout.yGameArea - me.yGlobal + selectedPlanet.diameterPlanet / 2, 
       selectedPlanet.diameterPlanet,
-      [50, 50, 50], // Dark gray center - using array instead of color() function
-      [120, 120, 130] // Lighter gray edge - using array instead of color() function
+      colorScheme.center, 
+      colorScheme.edge
     );
     
     // Black out areas outside the game area
@@ -588,6 +632,16 @@ function drawGameArea() {
 
     // Also draw warp gates in non-image mode
     drawWarpGatesOnGameArea();
+    
+    // Draw planet name in the bottom right of the game area
+    push();
+    fill('white');
+    textAlign(RIGHT, BOTTOM);
+    textSize(16);
+    text(`${colorScheme.name} Planet`, 
+         screenLayout.xGameArea + screenLayout.cropWidth - 20, 
+         screenLayout.yGameArea + screenLayout.cropHeight - 10);
+    pop();
   }
 
   // Draw flights and bullets on top
@@ -687,7 +741,7 @@ function drawWarpGatesOnGameArea() {
       noStroke();
 
       triangle(
-        screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + xLocalUp - 15,
+        screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp - 15,
         screenLayout.xGameArea + xLocalUp - 10, screenLayout.yGameArea + yLocalUp + 5,
         screenLayout.xGameArea + xLocalUp + 10, screenLayout.yGameArea + yLocalUp + 5
       );
