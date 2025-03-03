@@ -762,28 +762,28 @@ function drawWarpGateCountDownOnGameArea() {
       );
       pop();
     }
+  }
 
-    // Draw the "down" warp gate if it's visible on screen
-    if (onLocalScreenArea(xLocalDown, yLocalDown)) {
-      push();
-      if (isCooldown) {
-        // Draw cooldown progress arc
-        noFill();
-        stroke('magenta');
-        strokeWeight(10);
+  // Draw the "down" warp gate if it's visible on screen
+  if (onLocalScreenArea(xLocalDown, yLocalDown)) {
+    push();
+    if (isCooldown) {
+      // Draw cooldown progress arc
+      noFill();
+      stroke('magenta');
+      strokeWeight(10);
 
-        let diameterCountdown = 30
-        arc(
-          screenLayout.xGameArea + xLocalDown,
-          screenLayout.yGameArea + yLocalDown,
-          diameterCountdown * 0.8,
-          diameterCountdown * 0.8,
-          0,
-          cooldownRatio * TWO_PI
-        );
-      }
-      pop();
+      let diameterCountdown = 30
+      arc(
+        screenLayout.xGameArea + xLocalDown,
+        screenLayout.yGameArea + yLocalDown,
+        diameterCountdown * 0.8,
+        diameterCountdown * 0.8,
+        0,
+        cooldownRatio * TWO_PI
+      );
     }
+    pop();
   }
 }
 
