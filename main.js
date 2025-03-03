@@ -36,7 +36,7 @@ const screenLayout = {
   screenWidth: 2400, // 2400
   screenHeight: 1200, // 1200
   startPlanetIndex: 0,
-  diameterPlanet: 3500, //3838,  // 1500/3838 Must be the same as the actual size of the background image found in preload()
+  diameterPlanet: 3000, //3838,  // 1500/3838 Must be the same as the actual size of the background image found in preload()
   cropWidth: 1200, // 1800
   cropHeight: 700, // 1200
   xGameArea: 600,
@@ -75,7 +75,7 @@ function loadFrames() {
   // Reset counters before loading
   imagesLoaded = 0;
   loadedCounts = [0, 0, 0, 0, 0];
-  
+
   for (let planetIndex = 0; planetIndex < totalNumberOfPlanets; planetIndex++) {
     loadFramesForPlanet(planetIndex);
   }
@@ -97,7 +97,7 @@ function loadNextBatchForPlanet(planetIndex, batchIndex) {
 
     for (let i = start; i < end; i++) {
       minimapImg[planetIndex][i] = loadImage(
-        `images/planet${planetIndex}/minimap/planetA_${i}.png`, 
+        `images/planet${planetIndex}/minimap/planetA_${i}.png`,
         () => imageLoaded(planetIndex)
       );
     }
@@ -113,13 +113,13 @@ function loadNextBatchForPlanet(planetIndex, batchIndex) {
 function imageLoaded(planetIndex) {
   imagesLoaded++;
   loadedCounts[planetIndex]++;
-  
+
   // Log progress every 20 images
   if (imagesLoaded % 20 === 0) {
     console.log(`Loading progress: ${imagesLoaded}/${totalExpectedImages} images loaded`);
     console.log(`Planet progress: [${loadedCounts.join(', ')}]`);
   }
-  
+
   // Check if all images are loaded
   if (imagesLoaded >= totalExpectedImages) {
     animationReady = true;
@@ -129,22 +129,22 @@ function imageLoaded(planetIndex) {
 
 function setup() {
   createCanvas(screenLayout.screenWidth, screenLayout.screenHeight);
-  
+
   // Initialize the 2D array for minimapImg
   minimapImg = Array(totalNumberOfPlanets).fill().map(() => []);
-  
+
   // Calculate total expected images
   totalExpectedImages = totalImagesPerPlanet.reduce((sum, count) => sum + count, 0);
   console.log(`Total expected images: ${totalExpectedImages}`);
-  
-  loadFrames()
-/*
-  for (let i = 0; i < totalImages; i++) {
 
-        minimapImg[i] = loadImage(`images/planetA/planetAminimap2/planetA_${i}.png`, imageLoaded);
-    //    minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`, imageLoaded);
-      }*/
-    
+  loadFrames()
+  /*
+    for (let i = 0; i < totalImages; i++) {
+  
+          minimapImg[i] = loadImage(`images/planetA/planetAminimap2/planetA_${i}.png`, imageLoaded);
+      //    minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`, imageLoaded);
+        }*/
+
   fixedMinimap = new BasicMinimap(x = 250, y = 250, diameter = 300, color = 'grey', diameterPlanet = screenLayout.diameterPlanet);
 
   solarSystem = new SolarSystem(xSolarSystemCenter = 1250, ySolarSystemCenter = 900);
@@ -221,34 +221,14 @@ function preload() {
 
   for (let i = 0; i < 13; i++) {
     flightImages[i] = loadImage(`images/flight/flight${i}.png`);
-    //    flightImages[i] = loadImage(`images/boss1.png`);
   }
-  /*
-  for (let i = 0; i < totalImages; i++) {
-    minimapImg[i] = loadImage(`images/planetA/planetAminimap2/planetA_${i}.png`, imageLoaded);
-    //minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`, imageLoaded);
-  }*/
- 
-  /*
-  for (let i = 0; i < 778; i++) {
+  fixedMinimapImages = [];
+  fixedMinimapImages[0] = loadImage("images/planet0/planet0minimapWithWarpGate.png");
+  fixedMinimapImages[1] = loadImage("images/planet1/planet1minimapWithWarpGate.png"); // You should replace these with
+  fixedMinimapImages[2] = loadImage("images/planet2/planet2minimapWithWarpGate.png"); // actual images for each planet
+  fixedMinimapImages[3] = loadImage("images/planet3/planet3minimapWithWarpGate.png"); // when you have them
+  fixedMinimapImages[4] = loadImage("images/planet4/planet4minimapWithWarpGate.png");
 
-    minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`);
-  }*/
-//    minimapImageA = loadImage(`images/planet0/minimap/planetA_624.png`);
-    minimapImageA = loadImage(`images/planet0/planet0minimapWithWarpGate.png`);
-
-    minimapImage = loadImage(`images/planet0/planet0minimapWithWarpGate.png`);
-  //  minimapNightImage = loadImage(`images/background/bgMinimapNight.png`);
-  //  minimapHotImage = loadImage(`images/background/bgMinimapHot.png`);
-  //  backgroundImage = loadImage("images/background/bgLava3500.png");
-  //  backgroundImage = loadImage("images/bgLava1500.png");
-  //backgroundImage = loadImage("images/planet0/planet0withWarpGate.png"); // Circle 3000
-  //  backgroundImage = loadImage("images/planetA/planetAGlowingV1.png");// Circle 3838, Image 4000
-  //  backgroundImage = loadImage("images/background/bgLava.png");
-  //  backgroundNightImage = loadImage("images/background/bgNight.png");
-  //  backgroundHotImage = loadImage("images/background/bgHot.png");
-
-  // Load background images for each planet
   planetBackgroundImages = [];
   planetBackgroundImages[0] = loadImage("images/planet0/planet0withWarpGate.png");
   planetBackgroundImages[1] = loadImage("images/planet1/planet1withWarpGate.png"); // You should replace these with
@@ -264,10 +244,10 @@ function draw() {
   if (debugFrameCount >= 60) {
     debugFrameCount = 0;
     if (!animationReady) {
-      console.log(`Still loading: ${imagesLoaded}/${totalExpectedImages} (${Math.floor(imagesLoaded/totalExpectedImages*100)}%)`);
+      console.log(`Still loading: ${imagesLoaded}/${totalExpectedImages} (${Math.floor(imagesLoaded / totalExpectedImages * 100)}%)`);
     }
   }
-  
+
   if (!meHost && partyIsHost()) {
     meHost = true;
     updateTowerCount();
@@ -328,8 +308,9 @@ function draw() {
         fixedMinimap.drawObject(flight.xGlobal + flight.xLocal, flight.yGlobal + flight.yLocal, gameConstants.minimapMarkerDiamter, flight.color);
       }
     });
+    fixedMinimap.drawObject(selectedPlanet.xWarpGateUp, selectedPlanet.yWarpGateUp, gameConstants.minimapMarkerDiamter, 'cyan');
+    fixedMinimap.drawObject(selectedPlanet.xWarpGateDown, selectedPlanet.yWarpGateDown, gameConstants.minimapMarkerDiamter, 'magenta');
   }
-    
 
   // Draw Canon Towers for all players
   gameObjects.forEach(canon => {
@@ -407,7 +388,7 @@ function keyPressed() {
 
   if (keyCode === 49) { // 1
     me.planetIndex = 0;
-   // me.xGlobal = star
+    // me.xGlobal = star
   } else if (keyCode === 50) { // 2
     me.planetIndex = 1;
   } else if (keyCode === 51) { // 3
@@ -564,10 +545,10 @@ function drawGameArea() {
   if (detailsLevel.showGameAreaImage) {
     let cropX = me.xGlobal;
     let cropY = me.yGlobal;
-    
+
     // Use the planet background image that corresponds to the current planet index
     let currentBackgroundImage = planetBackgroundImages[me.planetIndex];
-    
+
     // Scale the background image to match planet size
     image(currentBackgroundImage,
       screenLayout.xGameArea,
@@ -579,7 +560,7 @@ function drawGameArea() {
       screenLayout.cropWidth,
       screenLayout.cropHeight
     );
-    
+
     // Draw the warp gates on top of the background
     drawWarpGatesOnGameArea();
   } else {
@@ -590,11 +571,11 @@ function drawGameArea() {
     rect(0, 0, screenLayout.xGameArea, screenLayout.screenHeight);
     rect(screenLayout.xGameArea + screenLayout.cropWidth, 0, screenLayout.screenWidth, screenLayout.screenHeight);
     rect(0, screenLayout.yGameArea + screenLayout.cropHeight, screenLayout.screenWidth, screenLayout.screenWidth);
-    
+
     // Also draw warp gates in non-image mode
     drawWarpGatesOnGameArea();
   }
-  
+
   // Draw flights and bullets on top
   activeFlights.forEach((flight) => {
     if (flight.planetIndex >= 0) {
@@ -606,93 +587,12 @@ function drawGameArea() {
 
 // Draw warp gates on the game area
 function drawWarpGatesOnGameArea() {
-  const gates = warpGates[me.planetIndex];
-  
-  // Draw up gate (cyan)
-  let upGateX = screenLayout.xGameArea + (gates.up.x - me.xGlobal);
-  let upGateY = screenLayout.yGameArea + (gates.up.y - me.yGlobal);
-  
-  if (onLocalScreenArea(gates.up.x - me.xGlobal, gates.up.y - me.yGlobal)) {
-    push();
-    fill('cyan');
-    stroke('white');
-    strokeWeight(2);
-    circle(upGateX, upGateY, gates.up.radius * 2);
-    
-    // Draw arrow indicator
-    fill('white');
-    noStroke();
-    triangle(
-      upGateX, upGateY - gates.up.radius/2,
-      upGateX - 10, upGateY - gates.up.radius/2 + 15,
-      upGateX + 10, upGateY - gates.up.radius/2 + 15
-    );
-    
-    // Text indicating next planet
-    let nextPlanet = me.planetIndex === 4 ? 0 : me.planetIndex + 1;
-    textAlign(CENTER);
-    text("To Planet " + nextPlanet, upGateX, upGateY + 5);
-    pop();
-  }
-  
-  // Draw down gate (magenta)
-  let downGateX = screenLayout.xGameArea + (gates.down.x - me.xGlobal);
-  let downGateY = screenLayout.yGameArea + (gates.down.y - me.yGlobal);
-  
-  if (onLocalScreenArea(gates.down.x - me.xGlobal, gates.down.y - me.yGlobal)) {
-    push();
-    fill('magenta');
-    stroke('white');
-    strokeWeight(2);
-    circle(downGateX, downGateY, gates.down.radius * 2);
-    
-    // Draw arrow indicator
-    fill('white');
-    noStroke();
-    triangle(
-      downGateX, downGateY + gates.down.radius/2,
-      downGateX - 10, downGateY + gates.down.radius/2 - 15,
-      downGateX + 10, downGateY + gates.down.radius/2 - 15
-    );
-    
-    // Text indicating previous planet
-    let prevPlanet = me.planetIndex === 0 ? 4 : me.planetIndex - 1;
-    textAlign(CENTER);
-    text("To Planet " + prevPlanet, downGateX, downGateY - 5);
-    pop();
-  }
-  
-  textAlign(LEFT);
-}
 
-// Add warp gate coordinates for each planet - already defined, just need to ensure they're correctly set
-const warpGates = [
-  // Planet 0
-  { 
-    up: { x: 1500, y: 500, radius: 75 },    // Warp to planet 1
-    down: { x: 1500, y: 2500, radius: 75 }  // Warp to planet 4
-  },
-  // Planet 1
-  { 
-    up: { x: 1700, y: 600, radius: 75 },    // Warp to planet 2
-    down: { x: 1300, y: 2400, radius: 75 }  // Warp to planet 0
-  },
-  // Planet 2
-  { 
-    up: { x: 1600, y: 700, radius: 75 },    // Warp to planet 3
-    down: { x: 1400, y: 2300, radius: 75 }  // Warp to planet 1
-  },
-  // Planet 3
-  { 
-    up: { x: 1500, y: 800, radius: 75 },    // Warp to planet 4
-    down: { x: 1500, y: 2200, radius: 75 }  // Warp to planet 2
-  },
-  // Planet 4
-  { 
-    up: { x: 1400, y: 900, radius: 75 },    // Warp to planet 0
-    down: { x: 1600, y: 2100, radius: 75 }  // Warp to planet 3
-  }
-];
+      // Calculate relative position based on global coordinates
+      let xLocal = me.xGlobal - selectedPlanet.xWarpGateUp;
+      let yLocal = me.yGlobal - selectedPlanet.yWarpGateUp;
+  
+}
 
 function moveMe() {
 
@@ -768,45 +668,6 @@ function moveMe() {
       me.bullets.splice(i, 1);
     }
   }
-
-  // Check for warp gates
-  checkForWarpGateCollision();
-}
-
-// Function to check and handle warp gate collisions
-function checkForWarpGateCollision() {
-  const currentPlanet = me.planetIndex;
-  const gates = warpGates[currentPlanet];
-  
-  // Distance to up gate
-  const distToUpGate = dist(me.xGlobal, me.yGlobal, gates.up.x, gates.up.y);
-  if (distToUpGate < gates.up.radius) {
-    // Warp up to next planet (special case for last planet)
-    const nextPlanet = currentPlanet === 4 ? 0 : currentPlanet + 1;
-    console.log(`Warping from planet ${currentPlanet} to planet ${nextPlanet}`);
-    me.planetIndex = nextPlanet;
-    
-    // Position player at the bottom gate of the new planet
-    const newGates = warpGates[nextPlanet];
-    me.xGlobal = newGates.down.x;
-    me.yGlobal = newGates.down.y - newGates.down.radius * 2; // Position above the down gate
-    
-    return; // Exit to prevent checking both gates
-  }
-  
-  // Distance to down gate
-  const distToDownGate = dist(me.xGlobal, me.yGlobal, gates.down.x, gates.down.y);
-  if (distToDownGate < gates.down.radius) {
-    // Warp down to previous planet (special case for first planet)
-    const prevPlanet = currentPlanet === 0 ? 4 : currentPlanet - 1;
-    console.log(`Warping from planet ${currentPlanet} to planet ${prevPlanet}`);
-    me.planetIndex = prevPlanet;
-    
-    // Position player at the top gate of the new planet
-    const newGates = warpGates[prevPlanet];
-    me.xGlobal = newGates.up.x;
-    me.yGlobal = newGates.up.y + newGates.up.radius * 2; // Position below the up gate
-  }
 }
 
 function checkCollisions() {
@@ -841,7 +702,7 @@ function checkCollisionsWithFlight(flight) {
 
 function checkCollisionsWithWarpGate() {
 
-//  console.log({selectedPlanet})
+  //  console.log({selectedPlanet})
   let di = dist(me.xGlobal + me.xLocal, me.yGlobal + me.yLocal, selectedPlanet.xWarpGateUp, selectedPlanet.yWarpGateUp);
 
   if (di < selectedPlanet.diameterWarpGate / 2) {
@@ -850,10 +711,10 @@ function checkCollisionsWithWarpGate() {
     } else {
       me.planetIndex++;
     }
-     console.log("Warping up")
+    console.log("Warping up")
 
-     return;
-  } 
+    return;
+  }
   di = dist(me.xGlobal + me.xLocal, me.yGlobal + me.yLocal, selectedPlanet.xWarpGateDown, selectedPlanet.yWarpGateDown);
 
   if (di < selectedPlanet.diameterWarpGate / 2) {
@@ -862,9 +723,9 @@ function checkCollisionsWithWarpGate() {
     } else {
       me.planetIndex--;
     }
-     console.log("Warping down")  
-     return;
-  } 
+    console.log("Warping down")
+    return;
+  }
 }
 
 function stepLocal() {
