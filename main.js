@@ -288,19 +288,6 @@ function draw() {
     backgroundStarsManager.show();
   }
 
-  if (detailsLevel.showStarSystem) {
-    push();
-    angleMode(DEGREES);
-
-    solarSystem.update();
-    solarSystem.draw();
-    pop()
-    activeFlights.forEach((flight) => {
-      if (flight.planetIndex >= 0) {
-        selectedPlanet.drawFlight(flight);
-      }
-    });
-  }
   angleMode(RADIANS);
 
   drawGameArea()
@@ -386,6 +373,21 @@ function draw() {
     offSetY += 20;
     text("Key l, k, j: Shooting interval 500, 1000, 2000", 20, offSetY);
     offSetY += 20;
+  }
+
+  if (detailsLevel.showStarSystem) {
+    console.log("draw star system")
+    push();
+    angleMode(DEGREES);
+
+    solarSystem.update();
+    solarSystem.draw();
+    pop()
+    activeFlights.forEach((flight) => {
+      if (flight.planetIndex >= 0) {
+        selectedPlanet.drawFlight(flight);
+      }
+    });
   }
 }
 
@@ -569,10 +571,17 @@ function drawGameArea() {
     // Draw the warp gates on top of the background
     drawWarpGateCountDownOnGameArea();
   } else {
-    // ...existing non-image mode code...
-    fill('grey')
-    circle(screenLayout.xGameArea - me.xGlobal + selectedPlanet.diameterPlanet / 2, screenLayout.yGameArea - me.yGlobal + selectedPlanet.diameterPlanet / 2, selectedPlanet.diameterPlanet);
-    fill('black')
+    // Draw the planet with a radial gradient
+    drawRadialGradient(
+      screenLayout.xGameArea - me.xGlobal + selectedPlanet.diameterPlanet / 2, 
+      screenLayout.yGameArea - me.yGlobal + selectedPlanet.diameterPlanet / 2, 
+      selectedPlanet.diameterPlanet,
+      [50, 50, 50], // Dark gray center - using array instead of color() function
+      [120, 120, 130] // Lighter gray edge - using array instead of color() function
+    );
+    
+    // Black out areas outside the game area
+    fill('black');
     rect(0, 0, screenLayout.xGameArea, screenLayout.screenHeight);
     rect(screenLayout.xGameArea + screenLayout.cropWidth, 0, screenLayout.screenWidth, screenLayout.screenHeight);
     rect(0, screenLayout.yGameArea + screenLayout.cropHeight, screenLayout.screenWidth, screenLayout.screenWidth);
@@ -585,12 +594,33 @@ function drawGameArea() {
   activeFlights.forEach((flight) => {
     if (flight.planetIndex >= 0) {
       flight.drawFlight();
-      flight.drawBullets()
+      flight.drawBullets();
     }
   });
 }
 
-// Draw warp gates on the game area with cooldown visualization
+// Helper function to draw a radial gradient with array colors instead of color() objects
+function drawRadialGradient(x, y, diameter, colorCenterArray, colorEdgeArray) {
+  push();
+  noStroke();
+  const radius = diameter / 2;
+  const numSteps = 50; // More steps = smoother gradient
+  
+  for (let i = numSteps; i > 0; i--) {
+    const step = i / numSteps;
+    const currentRadius = radius * step;
+    
+    // Interpolate between the two colors using arrays instead of color objects
+    const r = lerp(colorCenterArray[0], colorEdgeArray[0], 1 - step);
+    const g = lerp(colorCenterArray[1], colorEdgeArray[1], 1 - step);
+    const b = lerp(colorCenterArray[2], colorEdgeArray[2], 1 - step);
+    
+    fill(r, g, b);
+    circle(x, y, currentRadius * 2);
+  }
+  pop();
+}
+
 function drawWarpGatesOnGameArea() {
   // Calculate relative position for up warp gate based on global coordinates
   let xLocalUp = selectedPlanet.xWarpGateUp - me.xGlobal;
@@ -657,7 +687,7 @@ function drawWarpGatesOnGameArea() {
       noStroke();
 
       triangle(
-        screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp - 15,
+        screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + xLocalUp - 15,
         screenLayout.xGameArea + xLocalUp - 10, screenLayout.yGameArea + yLocalUp + 5,
         screenLayout.xGameArea + xLocalUp + 10, screenLayout.yGameArea + yLocalUp + 5
       );

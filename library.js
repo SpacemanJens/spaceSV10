@@ -318,12 +318,99 @@ class BasicMinimap {
     if (detailsLevel.showGameAreaImage) {
       image(fixedMinimapImages[me.planetIndex], this.xMinimap - this.diameterMinimap / 2, this.yMinimap - this.diameterMinimap / 2, this.diameterMinimap, this.diameterMinimap);
     } else {
-      fill('black')
+      // Fill background behind minimap
+      fill('black');
       rect(0, 0, screenLayout.xGameArea, screenLayout.screenHeight);
-      fill(this.colorMinimap);
-//      circle(this.xMinimap, this.yMinimap, this.diameterMinimap);
-      circle(this.xMinimap, this.yMinimap, this.diameterMinimap);
+      
+      // Draw minimap with gradient based on planet index
+      let colorCenter, colorEdge;
+      
+      switch(me.planetIndex) {
+        case 0: // Blue planet
+          colorCenter = [20, 50, 160];
+          colorEdge = [80, 120, 200];
+          break;
+        case 1: // Green planet
+          colorCenter = [20, 120, 40];
+          colorEdge = [100, 180, 100];
+          break;
+        case 2: // Red planet
+          colorCenter = [120, 20, 20];
+          colorEdge = [200, 100, 100];
+          break;
+        case 3: // Yellow planet
+          colorCenter = [120, 120, 20];
+          colorEdge = [200, 200, 100];
+          break;
+        case 4: // Purple planet
+          colorCenter = [80, 20, 120];
+          colorEdge = [150, 80, 200];
+          break;
+        default:
+          colorCenter = [50, 50, 50];
+          colorEdge = [120, 120, 120];
+      }
+      
+      // Draw the gradient
+      this.drawMinimapGradient(colorCenter, colorEdge);
+      
+      // Draw warp gate indicators on the minimap
+      this.drawWarpGateIndicators();
     }
+  }
+  
+  drawMinimapGradient(colorCenter, colorEdge) {
+    push();
+    noStroke();
+    const radius = this.diameterMinimap / 2;
+    const numSteps = 30; // More steps = smoother gradient
+    
+    for (let i = numSteps; i > 0; i--) {
+      const step = i / numSteps;
+      const currentRadius = radius * step;
+      
+      // Interpolate between the two colors using arrays instead of color objects
+      const r = lerp(colorCenter[0], colorEdge[0], 1 - step);
+      const g = lerp(colorCenter[1], colorEdge[1], 1 - step);
+      const b = lerp(colorCenter[2], colorEdge[2], 1 - step);
+      
+      fill(r, g, b);
+      circle(this.xMinimap, this.yMinimap, currentRadius * 2);
+    }
+    pop();
+  }
+  
+  drawWarpGateIndicators() {
+    // Draw warp gate indicators
+    const upGateX = map(this.xWarpGateUp, 0, this.diameterPlanet,
+                      this.xMinimap - this.diameterMinimap / 2,
+                      this.xMinimap + this.diameterMinimap / 2);
+    const upGateY = map(this.yWarpGateUp, 0, this.diameterPlanet,
+                      this.yMinimap - this.diameterMinimap / 2,
+                      this.yMinimap + this.diameterMinimap / 2);
+                      
+    const downGateX = map(this.xWarpGateDown, 0, this.diameterPlanet,
+                        this.xMinimap - this.diameterMinimap / 2,
+                        this.xMinimap + this.diameterMinimap / 2);
+    const downGateY = map(this.yWarpGateDown, 0, this.diameterPlanet,
+                        this.yMinimap - this.diameterMinimap / 2,
+                        this.yMinimap + this.diameterMinimap / 2);
+    
+    // Draw up gate
+    push();
+    fill('cyan');
+    stroke('white');
+    strokeWeight(1);
+    circle(upGateX, upGateY, 10);
+    pop();
+    
+    // Draw down gate
+    push();
+    fill('magenta');
+    stroke('white');
+    strokeWeight(1);
+    circle(downGateX, downGateY, 10);
+    pop();
   }
 
   isOnPlanet(xGlobalPlusLocal, yGlobalPlusLocal) {
@@ -429,7 +516,7 @@ class Planet extends CelestialObject {
   }
 
   draw() {
-    if (detailsLevel.showStarPlanetImages) {
+    if (detailsLevel.showGameAreaImage) {
 
       if (animationReady) {
         if (frameCount % 40 === 0) {
