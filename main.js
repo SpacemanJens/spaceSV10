@@ -49,6 +49,7 @@ const gameConstants = {
   diameterFlight: 100, // can be adjusted
   diameterBullet: 15,
   minimapMarkerDiamter: 10,
+  warpCooldownTime: 10000, // 10 seconds cooldown for warping
   shootingIntervals: {
     'Extreem (0.1s)': 100,
     'Very fast (0.3s)': 300,
@@ -216,7 +217,10 @@ function preload() {
     canonTowerCount: 3,
     canonTowerShootingInterval: 1000,
   });
-  me = partyLoadMyShared({ playerName: "observer" });
+  me = partyLoadMyShared({ 
+    playerName: "observer",
+    lastWarpTime: 0 // Track when player last used a warp gate
+  });
   guests = partyLoadGuestShareds();
 
   for (let i = 0; i < 13; i++) {
@@ -586,7 +590,7 @@ function drawGameArea() {
   });
 }
 
-// Draw warp gates on the game area
+// Draw warp gates on the game area with cooldown visualization
 function drawWarpGatesOnGameArea() {
   // Calculate relative position for up warp gate based on global coordinates
   let xLocalUp = selectedPlanet.xWarpGateUp - me.xGlobal;
@@ -596,51 +600,125 @@ function drawWarpGatesOnGameArea() {
   let xLocalDown = selectedPlanet.xWarpGateDown - me.xGlobal;
   let yLocalDown = selectedPlanet.yWarpGateDown - me.yGlobal;
   
+  // Check if warp gate is in cooldown
+  const currentTime = millis();
+  const isCooldown = currentTime - me.lastWarpTime < gameConstants.warpCooldownTime;
+  const cooldownRatio = isCooldown ? 
+    (currentTime - me.lastWarpTime) / gameConstants.warpCooldownTime : 1;
+  
   // Draw the "up" warp gate if it's visible on screen
   if (onLocalScreenArea(xLocalUp, yLocalUp)) {
     push();
-    fill('cyan');
-    stroke('white');
-    strokeWeight(2);
-    circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate);
-    
-    // Add inner details for the "up" gate
-    noFill();
-    stroke('white');
-    circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate * 0.7);
-    
-    // Add arrow indicating "up"
-    fill('white');
-    noStroke();
-    triangle(
-      screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp - 15,
-      screenLayout.xGameArea + xLocalUp - 10, screenLayout.yGameArea + yLocalUp + 5,
-      screenLayout.xGameArea + xLocalUp + 10, screenLayout.yGameArea + yLocalUp + 5
-    );
+    if (isCooldown) {
+      // Show cooldown state with different colors
+      fill('darkblue');
+      // Draw cooldown indicator as partial circle
+      stroke('white');
+      strokeWeight(2);
+      circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate);
+      
+      // Draw cooldown progress arc
+      noFill();
+      stroke('cyan');
+      strokeWeight(4);
+      arc(
+        screenLayout.xGameArea + xLocalUp, 
+        screenLayout.yGameArea + yLocalUp, 
+        selectedPlanet.diameterWarpGate * 0.8,
+        selectedPlanet.diameterWarpGate * 0.8,
+        0, 
+        cooldownRatio * TWO_PI
+      );
+      
+      // Show remaining seconds
+      fill('white');
+      noStroke();
+      textAlign(CENTER, CENTER);
+      textSize(14);
+      text(
+        Math.ceil((gameConstants.warpCooldownTime - (currentTime - me.lastWarpTime)) / 1000),
+        screenLayout.xGameArea + xLocalUp,
+        screenLayout.yGameArea + yLocalUp
+      );
+    } else {
+      // Normal active state
+      fill('cyan');
+      stroke('white');
+      strokeWeight(2);
+      circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate);
+      
+      // Add inner details for the "up" gate
+      noFill();
+      stroke('white');
+      circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate * 0.7);
+      
+      // Add arrow indicating "up"
+      fill('white');
+      noStroke();
+      triangle(
+        screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp - 15,
+        screenLayout.xGameArea + xLocalUp - 10, screenLayout.yGameArea + xLocalUp + 5,
+        screenLayout.xGameArea + xLocalUp + 10, screenLayout.yGameArea + yLocalUp + 5
+      );
+    }
     pop();
   }
   
   // Draw the "down" warp gate if it's visible on screen
   if (onLocalScreenArea(xLocalDown, yLocalDown)) {
     push();
-    fill('magenta');
-    stroke('white');
-    strokeWeight(2);
-    circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate);
-    
-    // Add inner details for the "down" gate
-    noFill();
-    stroke('white');
-    circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate * 0.7);
-    
-    // Add arrow indicating "down"
-    fill('white');
-    noStroke();
-    triangle(
-      screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown + 15,
-      screenLayout.xGameArea + xLocalDown - 10, screenLayout.yGameArea + yLocalDown - 5,
-      screenLayout.xGameArea + xLocalDown + 10, screenLayout.yGameArea + yLocalDown - 5
-    );
+    if (isCooldown) {
+      // Show cooldown state with different colors
+      fill('darkmagenta');
+      // Draw cooldown indicator as partial circle
+      stroke('white');
+      strokeWeight(2);
+      circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate);
+      
+      // Draw cooldown progress arc
+      noFill();
+      stroke('magenta');
+      strokeWeight(4);
+      arc(
+        screenLayout.xGameArea + xLocalDown, 
+        screenLayout.yGameArea + yLocalDown, 
+        selectedPlanet.diameterWarpGate * 0.8,
+        selectedPlanet.diameterWarpGate * 0.8,
+        0, 
+        cooldownRatio * TWO_PI
+      );
+      
+      // Show remaining seconds
+      fill('white');
+      noStroke();
+      textAlign(CENTER, CENTER);
+      textSize(14);
+      text(
+        Math.ceil((gameConstants.warpCooldownTime - (currentTime - me.lastWarpTime)) / 1000),
+        screenLayout.xGameArea + xLocalDown,
+        screenLayout.yGameArea + yLocalDown
+      );
+    } else {
+      // Normal active state
+      fill('magenta');
+      stroke('white');
+      strokeWeight(2);
+      circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate);
+      
+      // Add inner details for the "down" gate
+      noFill();
+      stroke('white');
+      circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate * 0.7);
+      
+      // Add arrow indicating "down"
+      fill('white');
+      noStroke();
+      triangle(
+        screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown + 15,
+        screenLayout.xGameArea + xLocalDown - 10, screenLayout.yGameArea + yLocalDown - 5,
+        screenLayout.xGameArea + xLocalDown + 10, screenLayout.yGameArea + yLocalDown - 5
+      );
+    }
     pop();
   }
 }
@@ -752,8 +830,15 @@ function checkCollisionsWithFlight(flight) {
 }
 
 function checkCollisionsWithWarpGate() {
+  // Check if warp gate is in cooldown
+  const currentTime = millis();
+  const isCooldown = currentTime - me.lastWarpTime < gameConstants.warpCooldownTime;
+  
+  // Don't allow warping during cooldown
+  if (isCooldown) {
+    return;
+  }
 
-  //  console.log({selectedPlanet})
   let di = dist(me.xGlobal + me.xLocal, me.yGlobal + me.yLocal, selectedPlanet.xWarpGateUp, selectedPlanet.yWarpGateUp);
 
   if (di < selectedPlanet.diameterWarpGate / 2) {
@@ -762,10 +847,11 @@ function checkCollisionsWithWarpGate() {
     } else {
       me.planetIndex++;
     }
-    console.log("Warping up")
-
+    console.log("Warping up");
+    me.lastWarpTime = currentTime; // Set the last warp time
     return;
   }
+  
   di = dist(me.xGlobal + me.xLocal, me.yGlobal + me.yLocal, selectedPlanet.xWarpGateDown, selectedPlanet.yWarpGateDown);
 
   if (di < selectedPlanet.diameterWarpGate / 2) {
@@ -774,7 +860,8 @@ function checkCollisionsWithWarpGate() {
     } else {
       me.planetIndex--;
     }
-    console.log("Warping down")
+    console.log("Warping down");
+    me.lastWarpTime = currentTime; // Set the last warp time
     return;
   }
 }
@@ -859,6 +946,7 @@ function spawn(flight) {
   me.diameter = flight.diameter;
   me.color = flight.color;
   me.bullets = [];
-  me.hits = Array(15).fill(0)
+  me.hits = Array(15).fill(0);
   me.planetIndex = screenLayout.startPlanetIndex;
+  me.lastWarpTime = 0; // Reset warp cooldown when spawning
 }
