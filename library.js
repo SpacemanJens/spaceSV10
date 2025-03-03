@@ -348,6 +348,14 @@ class BasicMinimap {
 
     circle(xObjectOnMinimap, yObjectOnMinimap, diameter);
   }
+  update(diameterPlanet, xWarpGateUp, yWarpGateUp, xWarpGateDown, yWarpGateDown, diameterWarpGate) {
+    this.diameterPlanet = diameterPlanet;
+    this.xWarpGateUp = xWarpGateUp;
+    this.yWarpGateUp = yWarpGateUp;       
+    this.xWarpGateDown = xWarpGateDown;
+    this.yWarpGateDown = yWarpGateDown;
+    this.diameterWarpGate = diameterWarpGate;
+  }
 }
 
 class BackgroundStarManager {
@@ -515,7 +523,7 @@ class SolarSystem {
     // constructor(angle, baseSpeed, distance, tiltEffect, baseSize, color {
     this.planets = [
       //      new Planet(10, 0.7, 400, 0.05, 40, [0, 102, 204]), xWarpGateUp, yWarpGateUp, xWarpGateDown, yWarpGateDown, diameterWarpGate
-      new Planet(10, 0.7, 400, 0.05, 3000, [0, 102, 204], 0, 595, 555, 1881, 2512, 50),
+      new Planet(10, 0.7, 400, 0.05, 3000, [0, 102, 204], 0, 595, 555, 1881, 2512, 100),
       new Planet(90, 0.5, 700, 0.08, 3500, [0, 122, 174], 0, 1267, 1780, 1970, 2708, 100),
       new Planet(190, 0.4, 1100, 0.04, 5000, [0, 142, 144], 0, 3225, 2809, 2176, 4643, 100),
       new Planet(270, 0.3, 1400, 0.06, 4000, [0, 162, 114], 0, 1611, 2370, 1070, 2665, 100),

@@ -208,7 +208,7 @@ function generateTowers(count) {
 }
 //s
 function preload() {
-  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV10Pv2");
+  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV10Lv3");
 
   shared = partyLoadShared("shared", {
     gameObjects: [],  // Start with empty array
@@ -254,6 +254,7 @@ function draw() {
   }
 
   selectedPlanet = solarSystem.planets[me.planetIndex];
+  fixedMinimap.update(selectedPlanet.diameterPlanet, selectedPlanet.xWarpGateUp, selectedPlanet.yWarpGateUp, selectedPlanet.xWarpGateDown, selectedPlanet.yWarpGateDown, selectedPlanet.diameterWarpGate);
   activeFlights = flights.filter(f => f.planetIndex >= 0); // Only target visible flights - changed filter
 
   // Handle updates
@@ -587,11 +588,61 @@ function drawGameArea() {
 
 // Draw warp gates on the game area
 function drawWarpGatesOnGameArea() {
-
-      // Calculate relative position based on global coordinates
-      let xLocal = me.xGlobal - selectedPlanet.xWarpGateUp;
-      let yLocal = me.yGlobal - selectedPlanet.yWarpGateUp;
+  // Calculate relative position for up warp gate based on global coordinates
+  let xLocalUp = selectedPlanet.xWarpGateUp - me.xGlobal;
+  let yLocalUp = selectedPlanet.yWarpGateUp - me.yGlobal;
   
+  // Calculate relative position for down warp gate based on global coordinates  
+  let xLocalDown = selectedPlanet.xWarpGateDown - me.xGlobal;
+  let yLocalDown = selectedPlanet.yWarpGateDown - me.yGlobal;
+  
+  // Draw the "up" warp gate if it's visible on screen
+  if (onLocalScreenArea(xLocalUp, yLocalUp)) {
+    push();
+    fill('cyan');
+    stroke('white');
+    strokeWeight(2);
+    circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate);
+    
+    // Add inner details for the "up" gate
+    noFill();
+    stroke('white');
+    circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate * 0.7);
+    
+    // Add arrow indicating "up"
+    fill('white');
+    noStroke();
+    triangle(
+      screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp - 15,
+      screenLayout.xGameArea + xLocalUp - 10, screenLayout.yGameArea + yLocalUp + 5,
+      screenLayout.xGameArea + xLocalUp + 10, screenLayout.yGameArea + yLocalUp + 5
+    );
+    pop();
+  }
+  
+  // Draw the "down" warp gate if it's visible on screen
+  if (onLocalScreenArea(xLocalDown, yLocalDown)) {
+    push();
+    fill('magenta');
+    stroke('white');
+    strokeWeight(2);
+    circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate);
+    
+    // Add inner details for the "down" gate
+    noFill();
+    stroke('white');
+    circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate * 0.7);
+    
+    // Add arrow indicating "down"
+    fill('white');
+    noStroke();
+    triangle(
+      screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown + 15,
+      screenLayout.xGameArea + xLocalDown - 10, screenLayout.yGameArea + yLocalDown - 5,
+      screenLayout.xGameArea + xLocalDown + 10, screenLayout.yGameArea + yLocalDown - 5
+    );
+    pop();
+  }
 }
 
 function moveMe() {
