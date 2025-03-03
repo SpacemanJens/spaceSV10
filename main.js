@@ -217,7 +217,7 @@ function preload() {
     canonTowerCount: 3,
     canonTowerShootingInterval: 1000,
   });
-  me = partyLoadMyShared({ 
+  me = partyLoadMyShared({
     playerName: "observer",
     lastWarpTime: 0 // Track when player last used a warp gate
   });
@@ -567,7 +567,7 @@ function drawGameArea() {
     );
 
     // Draw the warp gates on top of the background
-    drawWarpGatesOnGameArea();
+    drawWarpGateCountDownOnGameArea();
   } else {
     // ...existing non-image mode code...
     fill('grey')
@@ -595,17 +595,17 @@ function drawWarpGatesOnGameArea() {
   // Calculate relative position for up warp gate based on global coordinates
   let xLocalUp = selectedPlanet.xWarpGateUp - me.xGlobal;
   let yLocalUp = selectedPlanet.yWarpGateUp - me.yGlobal;
-  
+
   // Calculate relative position for down warp gate based on global coordinates  
   let xLocalDown = selectedPlanet.xWarpGateDown - me.xGlobal;
   let yLocalDown = selectedPlanet.yWarpGateDown - me.yGlobal;
-  
+
   // Check if warp gate is in cooldown
   const currentTime = millis();
   const isCooldown = currentTime - me.lastWarpTime < gameConstants.warpCooldownTime;
-  const cooldownRatio = isCooldown ? 
+  const cooldownRatio = isCooldown ?
     (currentTime - me.lastWarpTime) / gameConstants.warpCooldownTime : 1;
-  
+
   // Draw the "up" warp gate if it's visible on screen
   if (onLocalScreenArea(xLocalUp, yLocalUp)) {
     push();
@@ -616,20 +616,20 @@ function drawWarpGatesOnGameArea() {
       stroke('white');
       strokeWeight(2);
       circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate);
-      
+
       // Draw cooldown progress arc
       noFill();
       stroke('cyan');
       strokeWeight(4);
       arc(
-        screenLayout.xGameArea + xLocalUp, 
-        screenLayout.yGameArea + yLocalUp, 
+        screenLayout.xGameArea + xLocalUp,
+        screenLayout.yGameArea + yLocalUp,
         selectedPlanet.diameterWarpGate * 0.8,
         selectedPlanet.diameterWarpGate * 0.8,
-        0, 
+        0,
         cooldownRatio * TWO_PI
       );
-      
+
       // Show remaining seconds
       fill('white');
       noStroke();
@@ -646,24 +646,25 @@ function drawWarpGatesOnGameArea() {
       stroke('white');
       strokeWeight(2);
       circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate);
-      
+
       // Add inner details for the "up" gate
       noFill();
       stroke('white');
       circle(screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp, selectedPlanet.diameterWarpGate * 0.7);
-      
+
       // Add arrow indicating "up"
       fill('white');
       noStroke();
+
       triangle(
         screenLayout.xGameArea + xLocalUp, screenLayout.yGameArea + yLocalUp - 15,
-        screenLayout.xGameArea + xLocalUp - 10, screenLayout.yGameArea + xLocalUp + 5,
+        screenLayout.xGameArea + xLocalUp - 10, screenLayout.yGameArea + yLocalUp + 5,
         screenLayout.xGameArea + xLocalUp + 10, screenLayout.yGameArea + yLocalUp + 5
       );
     }
     pop();
   }
-  
+
   // Draw the "down" warp gate if it's visible on screen
   if (onLocalScreenArea(xLocalDown, yLocalDown)) {
     push();
@@ -674,20 +675,20 @@ function drawWarpGatesOnGameArea() {
       stroke('white');
       strokeWeight(2);
       circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate);
-      
+
       // Draw cooldown progress arc
       noFill();
       stroke('magenta');
       strokeWeight(4);
       arc(
-        screenLayout.xGameArea + xLocalDown, 
-        screenLayout.yGameArea + yLocalDown, 
+        screenLayout.xGameArea + xLocalDown,
+        screenLayout.yGameArea + yLocalDown,
         selectedPlanet.diameterWarpGate * 0.8,
         selectedPlanet.diameterWarpGate * 0.8,
-        0, 
+        0,
         cooldownRatio * TWO_PI
       );
-      
+
       // Show remaining seconds
       fill('white');
       noStroke();
@@ -704,15 +705,16 @@ function drawWarpGatesOnGameArea() {
       stroke('white');
       strokeWeight(2);
       circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate);
-      
+
       // Add inner details for the "down" gate
       noFill();
       stroke('white');
       circle(screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown, selectedPlanet.diameterWarpGate * 0.7);
-      
+
       // Add arrow indicating "down"
       fill('white');
       noStroke();
+
       triangle(
         screenLayout.xGameArea + xLocalDown, screenLayout.yGameArea + yLocalDown + 15,
         screenLayout.xGameArea + xLocalDown - 10, screenLayout.yGameArea + yLocalDown - 5,
@@ -720,6 +722,66 @@ function drawWarpGatesOnGameArea() {
       );
     }
     pop();
+  }
+}
+
+// Draw warp gates count down on the game area with cooldown visualization
+function drawWarpGateCountDownOnGameArea() {
+  // Calculate relative position for up warp gate based on global coordinates
+  let xLocalUp = selectedPlanet.xWarpGateUp - me.xGlobal;
+  let yLocalUp = selectedPlanet.yWarpGateUp - me.yGlobal;
+
+  // Calculate relative position for down warp gate based on global coordinates  
+  let xLocalDown = selectedPlanet.xWarpGateDown - me.xGlobal;
+  let yLocalDown = selectedPlanet.yWarpGateDown - me.yGlobal;
+
+  // Check if warp gate is in cooldown
+  const currentTime = millis();
+  const isCooldown = currentTime - me.lastWarpTime < gameConstants.warpCooldownTime;
+  const cooldownRatio = isCooldown ?
+    (currentTime - me.lastWarpTime) / gameConstants.warpCooldownTime : 1;
+
+  // Draw the "up" warp gate if it's visible on screen
+  if (onLocalScreenArea(xLocalUp, yLocalUp)) {
+    push();
+    if (isCooldown) {
+
+      // Draw cooldown progress arc
+      noFill();
+      stroke('cyan');
+      strokeWeight(4);
+      arc(
+        screenLayout.xGameArea + xLocalUp,
+        screenLayout.yGameArea + yLocalUp,
+        selectedPlanet.diameterWarpGate * 0.8,
+        selectedPlanet.diameterWarpGate * 0.8,
+        0,
+        cooldownRatio * TWO_PI
+      );
+      pop();
+    }
+
+    // Draw the "down" warp gate if it's visible on screen
+    if (onLocalScreenArea(xLocalDown, yLocalDown)) {
+      push();
+      if (isCooldown) {
+        // Draw cooldown progress arc
+        noFill();
+        stroke('magenta');
+        strokeWeight(17);
+
+        let diameterCountdown = 30
+        arc(
+          screenLayout.xGameArea + xLocalDown,
+          screenLayout.yGameArea + yLocalDown,
+          diameterCountdown * 0.8,
+          diameterCountdown * 0.8,
+          0,
+          cooldownRatio * TWO_PI
+        );
+      }
+      pop();
+    }
   }
 }
 
@@ -833,7 +895,7 @@ function checkCollisionsWithWarpGate() {
   // Check if warp gate is in cooldown
   const currentTime = millis();
   const isCooldown = currentTime - me.lastWarpTime < gameConstants.warpCooldownTime;
-  
+
   // Don't allow warping during cooldown
   if (isCooldown) {
     return;
@@ -851,7 +913,7 @@ function checkCollisionsWithWarpGate() {
     me.lastWarpTime = currentTime; // Set the last warp time
     return;
   }
-  
+
   di = dist(me.xGlobal + me.xLocal, me.yGlobal + me.yLocal, selectedPlanet.xWarpGateDown, selectedPlanet.yWarpGateDown);
 
   if (di < selectedPlanet.diameterWarpGate / 2) {
